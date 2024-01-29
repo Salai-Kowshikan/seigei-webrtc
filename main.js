@@ -52,7 +52,12 @@ let init = async () => {
   });
   document.getElementById("user-1").srcObject = localStream;
 
-//   muteLocalStream();
+  let audioTrack = localStream
+    .getTracks()
+    .find((track) => track.kind === "audio");
+  if (audioTrack) {
+    audioTrack.enabled = false;
+  }
 };
 
 let handleUserLeft = (MemberId) => {
