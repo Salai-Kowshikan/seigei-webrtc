@@ -1,36 +1,35 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>PeerChat</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='lobby.css'>
-</head>
-<body>
-    <main id="lobby-container">
-        <div id="form-container">
-            <div id="form__container__header">
-                <p>👋 Create OR Join a Room</p>
-            </div>
-
-            <div id="form__content__wrapper">
-                <form id="join-form">
-                    <input type="text" name="invite_link" required/>
-                    <input type="submit" value="Join Room" />
-                </form>
-            </div>
+<html class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Seigei - Translating Silence</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="h-full">
+    <main class="h-full flex justify-center items-center">
+      <div
+        class="flex bg-gray-600 w-1/2 flex-col h-1/2 items-center justify-evenly"
+      >
+        <div class="text-xl">
+          <p>Start video call if ready</p>
         </div>
+        <video id="webcam-preview" autoplay class="h-48"></video>
+        <form class="flex w-full justify-evenly items-center" id="room-form">
+          <input id="user-name" class="bg-white px-2 py-4" placeholder="Screen name" required/>
+          <button id="create-room" type="submit" class="bg-white px-2 py-4">
+            Create a new room
+          </button>
+          <button id="join-room" class="bg-white px-2 py-4 hidden">
+            join room
+          </button>
+        </>
+      </div>
     </main>
-</body>
-
-<script>
-    let form = document.getElementById('join-form')
-    form.addEventListener('submit', (e) => {
-        e.preventDefault()
-        let inviteCode = e.target.invite_link.value
-        window.location = `index.html?room=${inviteCode}` 
-    })
-</script>
-
+  </body>
+  <script src="scripts/helper.js" type="module"></script>
 </html>

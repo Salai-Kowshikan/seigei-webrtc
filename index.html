@@ -1,38 +1,35 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>PeerChat</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
-</head>
-<body>
-
-    <div id="videos">
-        <video class="video-player" id="user-1" autoplay playsinline></video>
-        <video class="video-player" id="user-2" autoplay playsinline></video>
+<html class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Seigei - Translating Silence</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="max-h-full">
+    <div id="videos" class="flex">
+      <div>
+        <span id="user-name-1"></span>
+        <video class="flex-1" id="user-1" autoplay playsinline></video>
+      </div>
+      <div>
+        <span id="user-name-2"></span>
+        <video class="flex-1" id="user-2" autoplay playsinline></video>
+      </div>
     </div>
-
-    <div id="controls">
-
-        <div class="control-container" id="camera-btn">
-            <img src="icons/camera.png" />
-        </div>
-
-        <div class="control-container" id="mic-btn">
-            <img src="icons/mic.png" />
-        </div>
-
-        <a href="lobby.html">
-            <div class="control-container" id="leave-btn">
-                <img src="icons/phone.png" />
-            </div>
-        </a>
-
+    <div class="flex justify-evenly m-6">
+      <button id="camera-btn" class="bg-gray-600 px-2 py-4">Toggle Mic</button>
+      <button id="mic-btn" class="bg-gray-600 px-2 py-4">Toggle Camera</button>
+      <a href="lobby.html" class="bg-gray-600 px-2 py-4"> Leave Meet </a>
+      <div>
+        <a id="invite-link">Invite link:</a>
+      </div>
     </div>
-    
-</body>
-<script src='agora-rtm-sdk-1.4.4.js'></script>
-<script src='main.js'></script>
+  </body>
+  <script src="scripts/agora-rtm-sdk-1.4.4.js"></script>
+  <script src="scripts/main.js"></script>
 </html>

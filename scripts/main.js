@@ -9,6 +9,8 @@ let channel;
 let queryString = window.location.search;
 let urlParams = new URLSearchParams(queryString);
 let roomId = urlParams.get("room");
+let user = urlParams.get("user");
+document.getElementById('invite-link').href = `${window.location.origin}/lobby.html?room=${roomId}`;
 
 if (!roomId) {
   window.location = "lobby.html";
