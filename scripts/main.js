@@ -53,13 +53,6 @@ let init = async () => {
     audio: true,
   });
   document.getElementById("user-1").srcObject = localStream;
-
-  let audioTrack = localStream
-    .getTracks()
-    .find((track) => track.kind === "audio");
-  if (audioTrack) {
-    audioTrack.enabled = false;
-  }
 };
 
 let handleUserLeft = (MemberId) => {
@@ -131,15 +124,6 @@ let createPeerConnection = async (MemberId) => {
       );
     }
   };
-};
-
-let muteLocalStream = () => {
-  let audioTrack = localStream
-    .getTracks()
-    .find((track) => track.kind === "audio");
-  if (audioTrack) {
-    audioTrack.enabled = false;
-  }
 };
 
 let createOffer = async (MemberId) => {
