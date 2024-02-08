@@ -9,12 +9,9 @@ let channel;
 let queryString = window.location.search;
 let urlParams = new URLSearchParams(queryString);
 let roomId = urlParams.get("room");
-let user = urlParams.get("user");
-document.getElementById('invite-link').href = `https://salai-kowshikan.github.io/seigei-webrtc/lobby.html?room=${roomId}`;
-
-if (!roomId) {
-  window.location = "lobby.html";
-}
+document.getElementById(
+  "invite-link"
+).href = `https://salai-kowshikan.github.io/seigei-webrtc/index.html?room=${roomId}`;
 
 let localStream;
 let remoteStream;
@@ -45,6 +42,7 @@ let init = async () => {
 
   channel.on("MemberJoined", handleUserJoined);
   channel.on("MemberLeft", handleUserLeft);
+  channel.on("ChannelMessage", handleMessageFromPeer); // Add this line
 
   client.on("MessageFromPeer", handleMessageFromPeer);
 
@@ -60,7 +58,21 @@ let handleUserLeft = (MemberId) => {
   document.getElementById("user-1").classList.remove("smallFrame");
 };
 
+let sendChatMessage = async () => {
+  let input = document.getElementById("chat-input");
+  let message = input.value;
+  input.value = "";
+
+  if (message) {
+    console.log("Message is sent " + message)
+    await channel.sendMessage({
+      text: JSON.stringify({ type: "chat", message: message }),
+    });
+  }
+};
+
 let handleMessageFromPeer = async (message, MemberId) => {
+  console.log("Received message: " + message.text);
   message = JSON.parse(message.text);
 
   if (message.type === "offer") {
@@ -75,6 +87,14 @@ let handleMessageFromPeer = async (message, MemberId) => {
     if (peerConnection) {
       peerConnection.addIceCandidate(message.candidate);
     }
+  }
+
+  if (message.type === "chat") {
+    console.log("Chat msg received")
+    let chatMessages = document.getElementById("chat-messages");
+    let messageElement = document.createElement("p");
+    messageElement.textContent = `${message.message}`;
+    chatMessages.appendChild(messageElement);
   }
 };
 
@@ -200,5 +220,10 @@ if (typeof window !== "undefined")
 
 document.getElementById("camera-btn").addEventListener("click", toggleCamera);
 document.getElementById("mic-btn").addEventListener("click", toggleMic);
+document.getElementById('chat-input').addEventListener('keypress', (event) => {
+  if (event.key === 'Enter') {
+    sendChatMessage();
+  }
+});
 
 init();
