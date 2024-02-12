@@ -9,9 +9,9 @@ let channel;
 let queryString = window.location.search;
 let urlParams = new URLSearchParams(queryString);
 let roomId = urlParams.get("room");
-document.getElementById(
-  "invite-link"
-).href = `https://salai-kowshikan.github.io/seigei-webrtc/index.html?room=${roomId}`;
+// document.getElementById(
+//   "invite-link"
+// ).href = `https://salai-kowshikan.github.io/seigei-webrtc/index.html?room=${roomId}`;
 
 let localStream;
 let remoteStream;

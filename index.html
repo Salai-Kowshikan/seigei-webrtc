@@ -9,29 +9,31 @@
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="main.css" />
   </head>
   <body class="max-h-full">
-    <div id="videos" class="flex">
-      <div>
-        <span id="user-name-1"></span>
-        <video class="flex-1" id="user-1" autoplay playsinline></video>
-      </div>
-      <div>
-        <span id="user-name-2"></span>
-        <video class="flex-1" id="user-2" autoplay playsinline></video>
-      </div>
+    <div class="bg-black flex items-center justify-center" id="div-user-1">
+      <video id="user-1" autoplay playsinline></video>
+      <video id="user-2" autoplay playsinline></video>
     </div>
-    <div class="flex justify-evenly m-6">
-      <button id="camera-btn" class="bg-gray-600 px-2 py-4">Toggle Camera </button>
-      <button id="mic-btn" class="bg-gray-600 px-2 py-4">Toggle Mic</button>
-      <a href="lobby.html" class="bg-gray-600 px-2 py-4"> Leave Meet </a>
-      <div>
-        <a id="invite-link">Invite link:</a>
-      </div>
-    </div>
-    <div>
-      <input id="chat-input" type="text">
+    <div id="chat-area" class="">
+      <div id="chat-title">Meeting Chat</div>
       <div id="chat-messages"></div>
+      <input id="chat-input" type="text" />
+    </div>
+    <div id="button-area" class="flex justify-evenly m-6">
+      <button id="camera-btn" class="bg-gray-600 p-4 rounded-full">
+        <img src="icons/Camera.png" class="h-8 w-8" />
+      </button>
+      <button id="mic-btn" class="bg-gray-600 p-4 rounded-full">
+        <img src="icons/mic.png" class="h-8 w-8" />
+      </button>
+      <button class="bg-gray-600 p-4 rounded-full">
+        <img src="icons/sign.png" class="h-8 w-8" />
+      </button>
+      <button class="bg-gray-600 p-4 rounded-full">
+        <img src="icons/exit.png" class="h-8 w-8" />
+      </button>
     </div>
   </body>
   <script src="scripts/agora-rtm-sdk-1.4.4.js"></script>
