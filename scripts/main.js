@@ -72,7 +72,7 @@ let sendChatMessage = async () => {
     let chatMessages = document.getElementById("chat-messages");
     let messageElement = document.createElement("p");
     messageElement.textContent = `${message}`;
-    messageElement.textContent = `${timestamp} ${message}`;
+    messageElement.textContent = `${message}  ${timestamp}`;
     messageElement.style.textAlign = "right";
     messageElement.style.color = "blue";
     chatMessages.appendChild(messageElement);
@@ -241,6 +241,10 @@ document.getElementById("chat-input").addEventListener("keypress", (event) => {
   if (event.key === "Enter") {
     sendChatMessage();
   }
+});
+
+document.getElementById('exit').addEventListener('click', function() {
+  window.location.href = 'https://seigei.onrender.com/Chat?exit=true';
 });
 
 init();
