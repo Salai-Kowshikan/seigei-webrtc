@@ -64,9 +64,24 @@ let sendChatMessage = async () => {
   input.value = "";
 
   if (message) {
-    console.log("Message is sent " + message)
+    console.log("Message is sent " + message);
+    let timestamp = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    let chatMessages = document.getElementById("chat-messages");
+    let messageElement = document.createElement("p");
+    messageElement.textContent = `${message}`;
+    messageElement.textContent = `${timestamp} ${message}`;
+    messageElement.style.textAlign = "right";
+    messageElement.style.color = "blue";
+    chatMessages.appendChild(messageElement);
     await channel.sendMessage({
-      text: JSON.stringify({ type: "chat", message: message }),
+      text: JSON.stringify({
+        type: "chat",
+        message: message,
+        timestamp: timestamp,
+      }),
     });
   }
 };
@@ -90,10 +105,12 @@ let handleMessageFromPeer = async (message, MemberId) => {
   }
 
   if (message.type === "chat") {
-    console.log("Chat msg received")
+    console.log("Chat msg received");
     let chatMessages = document.getElementById("chat-messages");
     let messageElement = document.createElement("p");
     messageElement.textContent = `${message.message}`;
+    messageElement.textContent = `${message.timestamp} ${message.message}`;
+    messageElement.style.textAlign = "left";
     chatMessages.appendChild(messageElement);
   }
 };
@@ -220,8 +237,8 @@ if (typeof window !== "undefined")
 
 document.getElementById("camera-btn").addEventListener("click", toggleCamera);
 document.getElementById("mic-btn").addEventListener("click", toggleMic);
-document.getElementById('chat-input').addEventListener('keypress', (event) => {
-  if (event.key === 'Enter') {
+document.getElementById("chat-input").addEventListener("keypress", (event) => {
+  if (event.key === "Enter") {
     sendChatMessage();
   }
 });

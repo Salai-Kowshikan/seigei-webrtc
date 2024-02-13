@@ -54,6 +54,7 @@ body {
 #chat-messages {
     flex-grow: 1;
     color: white;
+    padding: 10px;
 }
 
 #chat-input {
