@@ -13,12 +13,12 @@ body {
   height: 100vh;
 }
 
-#user-1 {
+#user-2 {
   object-fit: contain;
   max-height: 98%;
 }
 
-#user-2 {
+#user-1 {
   position: absolute;
   bottom: 0;
   right: 0;
