@@ -14,7 +14,6 @@ let roomId = urlParams.get("room");
 // ).href = `https://salai-kowshikan.github.io/seigei-webrtc/index.html?room=${roomId}`;
 
 let localStream;
-let clonedAudioStream;
 let remoteStream;
 let peerConnection;
 
@@ -52,11 +51,9 @@ let init = async () => {
     audio: true,
   });
 
-  // let audioTrack = localStream.getAudioTracks()[0];
-  // let clonedAudioTrack = audioTrack.clone();
-
-  // clonedAudioStream = new MediaStream([clonedAudioTrack]);
-  document.getElementById("user-1").srcObject = localStream;
+  let videoElement = document.getElementById("user-1");
+  videoElement.srcObject = localStream;
+  videoElement.muted = true;
 };
 
 let handleUserLeft = (MemberId) => {
