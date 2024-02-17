@@ -14,6 +14,7 @@ let roomId = urlParams.get("room");
 // ).href = `https://salai-kowshikan.github.io/seigei-webrtc/index.html?room=${roomId}`;
 
 let localStream;
+let clonedAudioStream;
 let remoteStream;
 let peerConnection;
 
@@ -50,6 +51,11 @@ let init = async () => {
     video: true,
     audio: true,
   });
+
+  // let audioTrack = localStream.getAudioTracks()[0];
+  // let clonedAudioTrack = audioTrack.clone();
+
+  // clonedAudioStream = new MediaStream([clonedAudioTrack]);
   document.getElementById("user-1").srcObject = localStream;
 };
 
@@ -133,7 +139,7 @@ let createPeerConnection = async (MemberId) => {
   if (!localStream) {
     localStream = await navigator.mediaDevices.getUserMedia({
       video: true,
-      audio: false,
+      audio: true,
     });
     document.getElementById("user-1").srcObject = localStream;
   }
@@ -243,8 +249,8 @@ document.getElementById("chat-input").addEventListener("keypress", (event) => {
   }
 });
 
-document.getElementById('exit').addEventListener('click', function() {
-  window.location.href = 'https://seigei.onrender.com/Chat?exit=true';
+document.getElementById("exit").addEventListener("click", function () {
+  window.location.href = "https://seigei.onrender.com/Chat?exit=true";
 });
 
 init();
