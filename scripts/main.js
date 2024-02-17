@@ -30,7 +30,9 @@ let constraints = {
     width: { min: 640, ideal: 1920, max: 1920 },
     height: { min: 480, ideal: 1080, max: 1080 },
   },
-  audio: true,
+  audio: {
+    echoCancellation: true, // Add this line
+  },
 };
 
 let init = async () => {
@@ -46,10 +48,7 @@ let init = async () => {
 
   client.on("MessageFromPeer", handleMessageFromPeer);
 
-  localStream = await navigator.mediaDevices.getUserMedia({
-    video: true,
-    audio: true,
-  });
+  localStream = await navigator.mediaDevices.getUserMedia(constraints);
 
   let videoElement = document.getElementById("user-1");
   videoElement.srcObject = localStream;
