@@ -16,6 +16,8 @@ let roomId = urlParams.get("room");
 let localStream;
 let remoteStream;
 let peerConnection;
+let recognition;
+let transcript = "";
 
 const servers = {
   iceServers: [
@@ -44,7 +46,7 @@ let init = async () => {
 
   channel.on("MemberJoined", handleUserJoined);
   channel.on("MemberLeft", handleUserLeft);
-  channel.on("ChannelMessage", handleMessageFromPeer); // Add this line
+  channel.on("ChannelMessage", handleMessageFromPeer);
 
   client.on("MessageFromPeer", handleMessageFromPeer);
 
@@ -53,11 +55,74 @@ let init = async () => {
   let videoElement = document.getElementById("user-1");
   videoElement.srcObject = localStream;
   videoElement.muted = true;
+
+  // Create a new SpeechRecognition instance
+  if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+    recognition = new (window.SpeechRecognition ||
+      window.webkitSpeechRecognition)();
+    recognition.interimResults = true;
+    recognition.continuous = true;
+    console.log("Speech recognition service created.");
+
+    // Create a new paragraph for the transcript
+    // let transcriptElement = document.createElement("p");
+    // document.body.appendChild(transcriptElement);
+
+    // Update the transcript when a result is returned
+    recognition.addEventListener("result", async (event) => {
+      transcript = Array.from(event.results)
+        .map((result) => result[0])
+        .map((result) => result.transcript)
+        .join("");
+      console.log(transcript);
+    });
+  } else {
+    console.log("Web Speech API is not supported in this browser.");
+  }
+
+  document
+    .getElementById("transcript-btn")
+    .addEventListener("click", toggleTranscription);
 };
 
 let handleUserLeft = (MemberId) => {
   document.getElementById("user-2").style.display = "none";
   document.getElementById("user-1").classList.remove("smallFrame");
+};
+
+let toggleTranscription = async () => {
+  if (recognition) {
+    if (recognition.recognizing) {
+      recognition.stop();
+      recognition.recognizing = false;
+
+      if (transcript) {
+        let timestamp = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        console.log("Message is sent " + transcript);
+        await channel.sendMessage({
+          text: JSON.stringify({
+            type: "chat",
+            message: transcript,
+            timestamp: timestamp,
+          }),
+        });
+        let chatMessages = document.getElementById("chat-messages");
+        let messageElement = document.createElement("p");
+        messageElement.textContent = `${transcript}`;
+        messageElement.textContent = `${transcript}  ${timestamp}`;
+        messageElement.style.textAlign = "right";
+        messageElement.style.color = "blue";
+        chatMessages.appendChild(messageElement);
+        transcript = ""; // Clear the transcript after sending
+      }
+    } else {
+      recognition.start();
+      recognition.recognizing = true;
+    }
+  }
 };
 
 let sendChatMessage = async () => {
