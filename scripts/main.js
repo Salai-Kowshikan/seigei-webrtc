@@ -1,3 +1,14 @@
+import {
+  handleUserLeft,
+  sendChatMessage,
+  handleMessageFromPeer,
+  handleUserJoined,
+  createPeerConnection,
+  createAnswer,
+  addAnswer,
+  createOffer,
+} from "./P2P.js";
+
 let APP_ID = "9eb8841f0c3a46e48808299ce0f92104";
 
 let token = null;
@@ -9,9 +20,6 @@ let channel;
 let queryString = window.location.search;
 let urlParams = new URLSearchParams(queryString);
 let roomId = urlParams.get("room");
-// document.getElementById(
-//   "invite-link"
-// ).href = `https://salai-kowshikan.github.io/seigei-webrtc/index.html?room=${roomId}`;
 
 let localStream;
 let remoteStream;
@@ -33,61 +41,12 @@ let constraints = {
     height: { min: 480, ideal: 1080, max: 1080 },
   },
   audio: {
-    echoCancellation: true, // Add this line
+    echoCancellation: true,
   },
 };
-
-let init = async () => {
-  client = await AgoraRTM.createInstance(APP_ID);
-  await client.login({ uid, token });
-
-  channel = client.createChannel(roomId);
-  await channel.join();
-
-  channel.on("MemberJoined", handleUserJoined);
-  channel.on("MemberLeft", handleUserLeft);
-  channel.on("ChannelMessage", handleMessageFromPeer);
-
-  client.on("MessageFromPeer", handleMessageFromPeer);
-
-  localStream = await navigator.mediaDevices.getUserMedia(constraints);
-
-  let videoElement = document.getElementById("user-1");
-  videoElement.srcObject = localStream;
-  videoElement.muted = true;
-
-  // Create a new SpeechRecognition instance
-  if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-    recognition = new (window.SpeechRecognition ||
-      window.webkitSpeechRecognition)();
-    recognition.interimResults = true;
-    recognition.continuous = true;
-    console.log("Speech recognition service created.");
-
-    // Create a new paragraph for the transcript
-    // let transcriptElement = document.createElement("p");
-    // document.body.appendChild(transcriptElement);
-
-    // Update the transcript when a result is returned
-    recognition.addEventListener("result", async (event) => {
-      transcript = Array.from(event.results)
-        .map((result) => result[0])
-        .map((result) => result.transcript)
-        .join("");
-      console.log(transcript);
-    });
-  } else {
-    console.log("Web Speech API is not supported in this browser.");
-  }
-
-  document
-    .getElementById("transcript-btn")
-    .addEventListener("click", toggleTranscription);
-};
-
-let handleUserLeft = (MemberId) => {
-  document.getElementById("user-2").style.display = "none";
-  document.getElementById("user-1").classList.remove("smallFrame");
+let leaveChannel = async () => {
+  await channel.leave();
+  await client.logout();
 };
 
 let toggleTranscription = async () => {
@@ -116,155 +75,15 @@ let toggleTranscription = async () => {
         messageElement.style.textAlign = "right";
         messageElement.style.color = "blue";
         chatMessages.appendChild(messageElement);
-        transcript = ""; // Clear the transcript after sending
+        transcript = "";
       }
     } else {
       recognition.start();
+      document.getElementById("transcript-btn").style.backgroundColor =
+        "rgb(255, 80, 80)";
       recognition.recognizing = true;
     }
   }
-};
-
-let sendChatMessage = async () => {
-  let input = document.getElementById("chat-input");
-  let message = input.value;
-  input.value = "";
-
-  if (message) {
-    console.log("Message is sent " + message);
-    let timestamp = new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    let chatMessages = document.getElementById("chat-messages");
-    let messageElement = document.createElement("p");
-    messageElement.textContent = `${message}`;
-    messageElement.textContent = `${message}  ${timestamp}`;
-    messageElement.style.textAlign = "right";
-    messageElement.style.color = "blue";
-    chatMessages.appendChild(messageElement);
-    await channel.sendMessage({
-      text: JSON.stringify({
-        type: "chat",
-        message: message,
-        timestamp: timestamp,
-      }),
-    });
-  }
-};
-
-let handleMessageFromPeer = async (message, MemberId) => {
-  console.log("Received message: " + message.text);
-  message = JSON.parse(message.text);
-
-  if (message.type === "offer") {
-    createAnswer(MemberId, message.offer);
-  }
-
-  if (message.type === "answer") {
-    addAnswer(message.answer);
-  }
-
-  if (message.type === "candidate") {
-    if (peerConnection) {
-      peerConnection.addIceCandidate(message.candidate);
-    }
-  }
-
-  if (message.type === "chat") {
-    console.log("Chat msg received");
-    let chatMessages = document.getElementById("chat-messages");
-    let messageElement = document.createElement("p");
-    messageElement.textContent = `${message.message}`;
-    messageElement.textContent = `${message.timestamp} ${message.message}`;
-    messageElement.style.textAlign = "left";
-    chatMessages.appendChild(messageElement);
-  }
-};
-
-let handleUserJoined = async (MemberId) => {
-  console.log("A new user joined the channel:", MemberId);
-
-  createOffer(MemberId);
-};
-
-let createPeerConnection = async (MemberId) => {
-  peerConnection = new RTCPeerConnection(servers);
-
-  remoteStream = new MediaStream();
-  document.getElementById("user-2").srcObject = remoteStream;
-  document.getElementById("user-2").style.display = "block";
-
-  document.getElementById("user-1").classList.add("smallFrame");
-
-  if (!localStream) {
-    localStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    document.getElementById("user-1").srcObject = localStream;
-  }
-
-  localStream.getTracks().forEach((track) => {
-    peerConnection.addTrack(track, localStream);
-  });
-
-  peerConnection.ontrack = (event) => {
-    event.streams[0].getTracks().forEach((track) => {
-      remoteStream.addTrack(track);
-    });
-  };
-
-  peerConnection.onicecandidate = async (event) => {
-    if (event.candidate) {
-      client.sendMessageToPeer(
-        {
-          text: JSON.stringify({
-            type: "candidate",
-            candidate: event.candidate,
-          }),
-        },
-        MemberId
-      );
-    }
-  };
-};
-
-let createOffer = async (MemberId) => {
-  await createPeerConnection(MemberId);
-
-  let offer = await peerConnection.createOffer();
-  await peerConnection.setLocalDescription(offer);
-
-  client.sendMessageToPeer(
-    { text: JSON.stringify({ type: "offer", offer: offer }) },
-    MemberId
-  );
-};
-
-let createAnswer = async (MemberId, offer) => {
-  await createPeerConnection(MemberId);
-
-  await peerConnection.setRemoteDescription(offer);
-
-  let answer = await peerConnection.createAnswer();
-  await peerConnection.setLocalDescription(answer);
-
-  client.sendMessageToPeer(
-    { text: JSON.stringify({ type: "answer", answer: answer }) },
-    MemberId
-  );
-};
-
-let addAnswer = async (answer) => {
-  if (!peerConnection.currentRemoteDescription) {
-    peerConnection.setRemoteDescription(answer);
-  }
-};
-
-let leaveChannel = async () => {
-  await channel.leave();
-  await client.logout();
 };
 
 let toggleCamera = async () => {
@@ -297,6 +116,46 @@ let toggleMic = async () => {
     document.getElementById("mic-btn").style.backgroundColor =
       "rgb(179, 102, 249, .9)";
   }
+};
+
+let init = async () => {
+  client = await AgoraRTM.createInstance(APP_ID);
+  await client.login({ uid, token });
+
+  channel = client.createChannel(roomId);
+  await channel.join();
+
+  channel.on("MemberJoined", handleUserJoined);
+  channel.on("MemberLeft", handleUserLeft);
+  channel.on("ChannelMessage", handleMessageFromPeer);
+
+  client.on("MessageFromPeer", handleMessageFromPeer);
+
+  localStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+  let videoElement = document.getElementById("user-1");
+  videoElement.srcObject = localStream;
+  videoElement.muted = true;
+  if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+    recognition = new (window.SpeechRecognition ||
+      window.webkitSpeechRecognition)();
+    recognition.interimResults = true;
+    recognition.continuous = true;
+    console.log("Speech recognition service created.");
+    recognition.addEventListener("result", async (event) => {
+      transcript = Array.from(event.results)
+        .map((result) => result[0])
+        .map((result) => result.transcript)
+        .join("");
+      console.log(transcript);
+    });
+  } else {
+    console.log("Web Speech API is not supported in this browser.");
+  }
+
+  document
+    .getElementById("transcript-btn")
+    .addEventListener("click", toggleTranscription);
 };
 
 if (typeof window !== "undefined")
