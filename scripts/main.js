@@ -206,6 +206,8 @@ let toggleTranscription = async () => {
         messageElement.style.color = "blue";
         chatMessages.appendChild(messageElement);
         transcript = "";
+        document.getElementById("transcript-btn").style.backgroundColor =
+        "rgb(179, 102, 249, .9)";
       }
     } else {
       recognition.start();
